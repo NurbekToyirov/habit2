@@ -1374,9 +1374,9 @@
   </div>
 
   <!-- ==================== MODAL 4: FULLSCREEN MOBILE-OPTIMIZED TASBEH / ZIKR COUNTER ==================== -->
-  <div id="zikrModalOverlay" class="fixed inset-0 z-50 bg-slate-950/98 text-white hidden flex-col justify-between select-none touch-manipulation overflow-hidden">
+   <div id="zikrModalOverlay" class="fixed inset-0 z-50 hidden flex-col justify-between select-none touch-manipulation overflow-hidden" style="background-color: var(--bg-page); color: var(--text-main);">
     <!-- Top Bar Controls -->
-    <div class="px-4 py-3 bg-slate-900/90 border-b border-slate-800/80 flex items-center justify-between gap-2 z-10 shrink-0">
+    <div class="px-4 py-3 border-b flex items-center justify-between gap-2 z-10 shrink-0 bg-white" style="border-color: var(--border-col);">
       <div class="flex items-center gap-2">
         <span class="text-lg">📿</span>
         <div>
@@ -1398,7 +1398,7 @@
     </div>
 
     <!-- Zikr Pill Selector Strip (Scrollable) -->
-    <div class="px-3 py-2 bg-slate-900/60 border-b border-slate-800/60 overflow-x-auto custom-scrollbar flex items-center gap-1.5 z-10 shrink-0" id="zikrSelectorPills">
+    <div class="px-3 py-2 border-b overflow-x-auto custom-scrollbar flex items-center gap-1.5 z-10 shrink-0 bg-white" id="zikrSelectorPills" style="border-color: var(--border-col);">
       <!-- Generated dynamically -->
     </div>
 
@@ -1410,7 +1410,20 @@
     <!-- Massive Tap-Anywhere Counter Area -->
     <div id="zikrTapArea" class="flex-1 flex flex-col items-center justify-center p-6 text-center cursor-pointer active:scale-[0.99] transition-transform relative select-none">
       <!-- Glow background circle -->
-      <div class="absolute w-72 h-72 sm:w-88 sm:h-88 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none"></div>
+      <!-- Arabic -->
+<div id="zikrArabicDisplay" class="text-3xl sm:text-5xl font-serif text-emerald-600 mb-2 pointer-events-none tracking-wide dir-rtl font-bold">
+  سُبْحَانَ اللَّهِ
+</div>
+<!-- Name -->
+<div id="zikrNameDisplay" class="text-base sm:text-xl font-bold text-slate-900 mb-1 pointer-events-none">
+  Subhanallah
+</div>
+<!-- Meaning -->
+<div id="zikrMeaningDisplay" class="text-xs text-slate-500 max-w-xs mb-5 pointer-events-none">
+  Alloh barcha ayb-nuqsonlardan pokdir
+</div>
+<!-- Big Count Number -->
+<span id="zikrBigCount" class="text-5xl sm:text-6xl font-black text-slate-900 font-mono tracking-tight transition-transform duration-100">0</span>
 
       <!-- Arabic Calligraphy -->
       <div id="zikrArabicDisplay" class="text-2xl sm:text-4xl font-serif text-emerald-400 mb-2 pointer-events-none tracking-wide dir-rtl font-bold">
@@ -1440,15 +1453,8 @@
         </div>
       </div>
 
-      <!-- Tap hint -->
-      <div class="mt-4 flex items-center gap-2 text-xs font-medium text-emerald-400/90 bg-emerald-950/60 border border-emerald-800/60 px-4 py-2 rounded-full pointer-events-none shadow-sm">
-        <span>👆</span>
-        <span>Ekranning istalgan joyiga bosing • Har bir bosish +1</span>
-      </div>
-    </div>
-
     <!-- Bottom Action Bar -->
-    <div class="px-4 py-3 bg-slate-900/95 border-t border-slate-800/80 flex items-center justify-between gap-2 z-10 shrink-0">
+    <div class="px-4 py-3 border-t flex items-center justify-between gap-2 z-10 shrink-0 bg-white" style="border-color: var(--border-col);">
       <div class="flex items-center gap-1.5">
         <button type="button" id="zikrDecBtn" class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-95 transition cursor-pointer" title="1 ta kamaytirish (xato bosilganda)">
           -1
@@ -3982,10 +3988,10 @@
           const pill = document.createElement('button');
           pill.type = 'button';
           pill.className = `px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
-            isActive
-              ? 'bg-emerald-600 text-white shadow-xs'
-              : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-          }`;
+  isActive
+    ? 'bg-emerald-600 text-white shadow-xs'
+    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
+}`;
           pill.innerHTML = `
             <span>${escapeHtml(z.name)}</span>
             <span class="text-[10px] font-mono ${isActive ? 'text-emerald-100' : 'text-slate-400'}">${count}/${z.target}</span>
