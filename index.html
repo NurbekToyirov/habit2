@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-  <title>NURHabit — Habit, Namoz, Mind Detox &amp; Diary Tracker</title>
+  <title>PulseHabit — Habit, Namoz, Mind Detox &amp; Diary Tracker</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -165,6 +165,7 @@
       transition: stroke-dasharray 0.35s ease;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-indigo-600 selection:text-white pb-20 lg:pb-6">
 
@@ -183,7 +184,7 @@
         </div>
         <div class="min-w-0">
           <div class="flex items-center gap-1.5">
-            <h1 class="text-sm sm:text-lg font-bold tracking-tight text-slate-900 truncate">NURHabit</h1>
+            <h1 class="text-sm sm:text-lg font-bold tracking-tight text-slate-900 truncate">PulseHabit</h1>
             <span id="headerTodayRankBadge" class="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full accent-badge border shrink-0">Rank S</span>
           </div>
           <p class="text-[10px] sm:text-[11px] text-slate-500 truncate" id="headerActiveDateSubtitle">Loading date...</p>
@@ -208,7 +209,11 @@
 
       <!-- Quick Right Actions (Compact on Mobile) -->
       <div class="flex items-center gap-1.5 shrink-0">
-        <button type="button" id="openAddModalBtn" class="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold accent-bg shadow-2xs transition-all cursor-pointer">
+        <button type="button" id="openCloudSyncBtn" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 cursor-pointer transition shadow-2xs" title="Supabase Cloud Sync (Multiple devices)">
+          <span id="cloudSyncStatusIcon">☁️</span>
+          <span id="cloudSyncStatusText" class="hidden sm:inline">Sync</span>
+        </button>
+        <button type="button" id="openAddModalBtn"  class="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold accent-bg shadow-2xs transition-all cursor-pointer">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
           </svg>
@@ -255,7 +260,10 @@
 
         <!-- Export / Backup / Reset Controls -->
         <div class="flex items-center gap-1.5 flex-wrap">
-          <button type="button" id="exportCsvBtn" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs transition cursor-pointer">
+          <button type="button" id="drawerCloudSyncBtn" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 transition cursor-pointer">
+            <span>☁️ Cloud Sync (Supabase)</span>
+          </button>
+          <button type="button" id="exportCsvBtn"  class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs transition cursor-pointer">
             <span>Export CSV</span>
           </button>
           <button type="button" id="exportJsonBtn" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-semibold bg-slate-800 hover:bg-slate-900 text-white shadow-2xs transition cursor-pointer">
@@ -1374,24 +1382,24 @@
   </div>
 
   <!-- ==================== MODAL 4: FULLSCREEN MOBILE-OPTIMIZED TASBEH / ZIKR COUNTER ==================== -->
-   <div id="zikrModalOverlay" class="fixed inset-0 z-50 hidden flex-col justify-between select-none touch-manipulation overflow-hidden" style="background-color: var(--bg-page); color: var(--text-main);">
+  <div id="zikrModalOverlay" class="fixed inset-0 z-50 hidden flex-col justify-between select-none touch-manipulation overflow-hidden" style="background-color: var(--bg-page); color: var(--text-main);">
     <!-- Top Bar Controls -->
     <div class="px-4 py-3 border-b flex items-center justify-between gap-2 z-10 shrink-0 bg-white" style="border-color: var(--border-col);">
       <div class="flex items-center gap-2">
         <span class="text-lg">📿</span>
         <div>
-          <h3 class="text-xs sm:text-sm font-bold text-slate-100">Elektron Tasbeh</h3>
-          <p class="text-[10px] text-slate-400" id="zikrModalSelectedDateLabel">Bugun uchun</p>
+          <h3 class="text-xs sm:text-sm font-bold text-slate-900">Elektron Tasbeh</h3>
+          <p class="text-[10px] text-slate-500" id="zikrModalSelectedDateLabel">Bugun uchun</p>
         </div>
       </div>
       <div class="flex items-center gap-1.5">
-        <button type="button" id="zikrSoundToggleBtn" class="p-2 rounded-xl text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer" title="Ovoz va titrash">
+        <button type="button" id="zikrSoundToggleBtn" class="p-2 rounded-xl text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer" title="Ovoz va titrash">
           🔊
         </button>
-        <button type="button" id="zikrResetBtn" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-rose-900/40 text-slate-300 hover:text-rose-400 border border-slate-700 transition cursor-pointer" title="Hozirgi zikrni nolga tushirish">
+        <button type="button" id="zikrResetBtn" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 border border-slate-200 transition cursor-pointer" title="Hozirgi zikrni nolga tushirish">
           ↺ Nolga
         </button>
-        <button type="button" id="closeZikrModalBtn" class="p-2 rounded-xl text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 transition cursor-pointer font-bold" title="Yopish">
+        <button type="button" id="closeZikrModalBtn" class="p-2 rounded-xl text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer font-bold" title="Yopish">
           ✕
         </button>
       </div>
@@ -1403,63 +1411,48 @@
     </div>
 
     <!-- Target Reached Banner (celebration) -->
-    <div id="zikrTargetReachedBanner" class="hidden px-4 py-2 bg-emerald-600/90 text-white text-xs font-bold text-center z-10 animate-pulse">
+    <div id="zikrTargetReachedBanner" class="hidden px-4 py-2 bg-emerald-600 text-white text-xs font-bold text-center z-10 animate-pulse">
       🎉 Alhamdulillah! Maqsad bajarildi. Keyingi zikrga o'tishingiz mumkin.
     </div>
 
-    <!-- Massive Tap-Anywhere Counter Area -->
+    <!-- Massive Tap-Anywhere Counter Area (100% Solid Opaque System Theme Background) -->
     <div id="zikrTapArea" class="flex-1 flex flex-col items-center justify-center p-6 text-center cursor-pointer active:scale-[0.99] transition-transform relative select-none">
-      <!-- Glow background circle -->
-      <!-- Arabic -->
-<div id="zikrArabicDisplay" class="text-3xl sm:text-5xl font-serif text-emerald-600 mb-2 pointer-events-none tracking-wide dir-rtl font-bold">
-  سُبْحَانَ اللَّهِ
-</div>
-<!-- Name -->
-<div id="zikrNameDisplay" class="text-base sm:text-xl font-bold text-slate-900 mb-1 pointer-events-none">
-  Subhanallah
-</div>
-<!-- Meaning -->
-<div id="zikrMeaningDisplay" class="text-xs text-slate-500 max-w-xs mb-5 pointer-events-none">
-  Alloh barcha ayb-nuqsonlardan pokdir
-</div>
-<!-- Big Count Number -->
-<span id="zikrBigCount" class="text-5xl sm:text-6xl font-black text-slate-900 font-mono tracking-tight transition-transform duration-100">0</span>
-
       <!-- Arabic Calligraphy -->
-      <div id="zikrArabicDisplay" class="text-2xl sm:text-4xl font-serif text-emerald-400 mb-2 pointer-events-none tracking-wide dir-rtl font-bold">
+      <div id="zikrArabicDisplay" class="text-3xl sm:text-5xl font-serif text-emerald-600 mb-2 pointer-events-none tracking-wide dir-rtl font-bold">
         سُبْحَانَ اللَّهِ
       </div>
 
-      <!-- Transliteration Name -->
-      <div id="zikrNameDisplay" class="text-base sm:text-xl font-bold text-slate-100 mb-1 pointer-events-none">
-        SubhanAllah
+      <!-- Transliteration Name (Subhanallah) -->
+      <div id="zikrNameDisplay" class="text-base sm:text-xl font-bold text-slate-900 mb-1 pointer-events-none">
+        Subhanallah
       </div>
 
       <!-- Meaning / Subtitle -->
-      <div id="zikrMeaningDisplay" class="text-xs text-slate-400 max-w-xs mb-5 pointer-events-none">
+      <div id="zikrMeaningDisplay" class="text-xs text-slate-500 max-w-xs mb-5 pointer-events-none">
         Alloh barcha ayb-nuqsonlardan pokdir
       </div>
 
       <!-- Big Counter Number with Circular Progress -->
       <div class="relative my-2 pointer-events-none flex items-center justify-center">
         <svg class="w-48 h-48 sm:w-60 sm:h-60 transform -rotate-90 pointer-events-none" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="44" stroke="currentColor" stroke-width="5" class="text-slate-800 fill-none" />
+          <circle cx="50" cy="50" r="44" stroke="currentColor" stroke-width="5" class="text-slate-200 fill-none" />
           <circle id="zikrProgressCircle" cx="50" cy="50" r="44" stroke="currentColor" stroke-width="5" stroke-linecap="round" class="text-emerald-500 fill-none transition-all duration-150" stroke-dasharray="276.46" stroke-dashoffset="276.46" />
         </svg>
 
         <div class="absolute inset-0 flex flex-col items-center justify-center">
-          <span id="zikrBigCount" class="text-5xl sm:text-6xl font-black text-white font-mono tracking-tight transition-transform duration-100">0</span>
-          <span id="zikrTargetSub" class="text-xs font-semibold text-slate-400 mt-1">/ 33 marta</span>
+          <span id="zikrBigCount" class="text-5xl sm:text-6xl font-black text-slate-900 font-mono tracking-tight transition-transform duration-100">0</span>
+          <span id="zikrTargetSub" class="text-xs font-semibold text-slate-500 mt-1">/ 33 marta</span>
         </div>
       </div>
+    </div>
 
     <!-- Bottom Action Bar -->
     <div class="px-4 py-3 border-t flex items-center justify-between gap-2 z-10 shrink-0 bg-white" style="border-color: var(--border-col);">
       <div class="flex items-center gap-1.5">
-        <button type="button" id="zikrDecBtn" class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-95 transition cursor-pointer" title="1 ta kamaytirish (xato bosilganda)">
+        <button type="button" id="zikrDecBtn" class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 active:scale-95 transition cursor-pointer" title="1 ta kamaytirish (xato bosilganda)">
           -1
         </button>
-        <button type="button" id="zikrTargetToggleBtn" class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-95 transition cursor-pointer">
+        <button type="button" id="zikrTargetToggleBtn" class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 active:scale-95 transition cursor-pointer">
           Maqsad: <span id="zikrCurrentTargetLabel">33</span>
         </button>
       </div>
@@ -1471,13 +1464,113 @@
     </div>
   </div>
 
+  <!-- ==================== MODAL 5: SUPABASE CLOUD SYNC & AUTH ==================== -->
+  <div id="supabaseModalOverlay" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto" style="background-color: var(--bg-card); color: var(--text-main);">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3" style="border-color: var(--border-col);">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">☁️</span>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">Supabase Cloud Sync</h3>
+            <p class="text-xs text-slate-500">Telefon, kompyuter va barcha qurilmalarda bir xil ma'lumotlar</p>
+          </div>
+        </div>
+        <button type="button" id="closeSupabaseModalBtn" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- State 1: Active Logged In Session -->
+      <div id="sbSessionSection" class="hidden space-y-3 p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-xs font-bold text-emerald-900">Faol seans: <strong id="sbUserEmailText" class="font-extrabold text-emerald-800">user@example.com</strong></span>
+          </div>
+          <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-md">Ulangan</span>
+        </div>
+        <p class="text-[11px] text-emerald-700">Barcha o'zgarishlar avtomatik ravishda bulutga yuklanadi va boshqa qurilmalarda darhol aks etadi.</p>
+        <div class="flex items-center gap-2 pt-1">
+          <button type="button" id="sbManualSyncBtn" class="flex-1 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer active:scale-95 transition shadow-xs flex items-center justify-center gap-1.5">
+            <span>🔄 Hozir sinxronlash (Pull & Push)</span>
+          </button>
+          <button type="button" id="sbLogoutBtn" class="px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-rose-50 hover:text-rose-600 cursor-pointer transition">
+            Chiqish
+          </button>
+        </div>
+      </div>
+
+      <!-- State 2: Login / Register Form (Visible when configured but not logged in) -->
+      <div id="sbAuthSection" class="space-y-3">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Hisobga kirish yoki Ro'yxatdan o'tish</h4>
+          <span class="text-[11px] text-slate-400">Email orqali</span>
+        </div>
+        <div class="space-y-2">
+          <div>
+            <label for="sbEmailInput" class="block text-xs font-semibold text-slate-700 mb-1">Email</label>
+            <input type="email" id="sbEmailInput" placeholder="misol@gmail.com" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm bg-white" />
+          </div>
+          <div>
+            <label for="sbPasswordInput" class="block text-xs font-semibold text-slate-700 mb-1">Parol</label>
+            <input type="password" id="sbPasswordInput" placeholder="Kamida 6 ta belgi" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm bg-white" />
+          </div>
+        </div>
+        <div class="flex items-center gap-2 pt-1">
+          <button type="button" id="sbSignInBtn" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white cursor-pointer transition active:scale-95 shadow-xs">
+            Kirish (Sign In)
+          </button>
+          <button type="button" id="sbSignUpBtn" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 cursor-pointer transition active:scale-95">
+            Ro'yxatdan o'tish (Sign Up)
+          </button>
+        </div>
+        <p id="sbAuthMessage" class="hidden text-xs font-semibold p-2.5 rounded-xl"></p>
+      </div>
+
+      <!-- State 3: Supabase Project API Credentials Configuration -->
+      <details id="sbConfigDetails" class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2.5">
+        <summary class="font-bold text-slate-800 cursor-pointer select-none flex items-center justify-between">
+          <span>⚙️ Supabase API Kalitlari (Project URL & Anon Key)</span>
+          <span class="text-[10px] text-slate-400 font-mono">Ko'rish / Tahrirlash</span>
+        </summary>
+        <div class="space-y-2 pt-2">
+          <div>
+            <label for="sbProjectUrlInput" class="block text-[11px] font-semibold text-slate-600 mb-1">Project URL</label>
+            <input type="url" id="sbProjectUrlInput" placeholder="https://xxxxxxxxxxxx.supabase.co" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs bg-white font-mono" />
+          </div>
+          <div>
+            <label for="sbAnonKeyInput" class="block text-[11px] font-semibold text-slate-600 mb-1">Project Anon Key (Public API Key)</label>
+            <textarea id="sbAnonKeyInput" rows="2" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs bg-white font-mono resize-none"></textarea>
+          </div>
+          <button type="button" id="sbSaveConfigBtn" class="w-full py-2 rounded-lg text-xs font-bold accent-bg cursor-pointer transition shadow-2xs">
+            Kalitlarni saqlash va Ulanish
+          </button>
+
+          <!-- SQL Helper snippet -->
+          <div class="pt-2 border-t border-slate-200/80">
+            <span class="block text-[10px] font-bold text-slate-600 mb-1">Supabase SQL Editor'da 1 marta yurgiziladigan jadval kodi:</span>
+            <pre class="bg-slate-900 text-slate-200 p-2.5 rounded-lg text-[10px] font-mono overflow-x-auto select-all">CREATE TABLE IF NOT EXISTS pulsehabit_data (
+  user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  state jsonb NOT NULL,
+  updated_at timestamptz DEFAULT now()
+);
+ALTER TABLE pulsehabit_data ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can manage own data" ON pulsehabit_data
+  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);</pre>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toastContainer" class="fixed bottom-16 lg:bottom-5 right-4 z-50 pointer-events-none flex flex-col gap-2"></div>
 
   <script>
     (function () {
-      const STORAGE_KEY = 'nurhabit_tracker_state_v6';
-      const THEME_STORAGE_KEY = 'nurhabit_theme_prefs_v1';
+      const STORAGE_KEY = 'pulsehabit_tracker_state_v6';
+      const THEME_STORAGE_KEY = 'pulsehabit_theme_prefs_v1';
 
       const PALETTES = {
         indigo: { hex600: '#4f46e5', hex700: '#4338ca', hex50: '#eef2ff', hex100: '#e0e7ff', text: '#4338ca', rgb: '79, 70, 229' },
@@ -1509,8 +1602,8 @@
         { id: 'subhanalloh', name: 'Subhanallah', arabic: 'سُبْحَانَ اللَّهِ', meaning: 'Alloh barcha ayb-nuqsonlardan pokdir', target: 33, step: 33 },
         { id: 'alhamdulillah', name: 'Alhamdulillah', arabic: 'الْحَمْدُ لِلَّهِ', meaning: 'Hamd va maqtov faqat Allohgadir', target: 33, step: 33 },
         { id: 'allohuakbar', name: 'Allohu Akbar', arabic: 'اللَّهُ أَكْبَرُ', meaning: 'Alloh barchadan ulug\'dir', target: 34, step: 34 },
-        { id: 'istigfor', name: 'Astag\'firullah (Istig\'for)', arabic: 'أَسْتَغْفِرُ اللَّهَ', meaning: 'Allohdan mag\'firat so\'rayman', target: 100, step: 33 },
-        { id: 'salovot', name: 'Salovot (Allohumma solli...)', arabic: 'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ', meaning: 'Payg\'ambarimiz Muhammad (s.a.v.)ga salovot', target: 100, step: 33 },
+        { id: 'istigfor', name: 'Astag\'firullah (Istighfar)', arabic: 'أَسْتَغْفِرُ اللَّهَ', meaning: 'Allohdan mag\'firat so\'rayman', target: 100, step: 33 },
+        { id: 'salovot', name: 'Salovat', arabic: 'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ', meaning: 'Payg\'ambarimiz Muhammad (s.a.v.)ga salovot', target: 100, step: 33 },
         { id: 'laailaha', name: 'La ilaha illallah', arabic: 'لَا إِلَٰهَ إِلَّا اللَّهُ', meaning: 'Allohdan o\'zga iloh yo\'q', target: 100, step: 33 }
       ];
 
@@ -1850,7 +1943,7 @@
 
       function loadState() {
         try {
-          const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('nurhabit_tracker_state_v5') || localStorage.getItem('nurhabit_tracker_state_v4');
+          const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('pulsehabit_tracker_state_v5') || localStorage.getItem('pulsehabit_tracker_state_v4');
           if (raw) {
             const parsed = JSON.parse(raw);
             if (parsed && Array.isArray(parsed.habits)) {
@@ -1873,9 +1966,204 @@
         return buildDefaultState();
       }
 
+      
+      // ==================== SUPABASE CLOUD SYNC ENGINE ====================
+      const SUPABASE_CONFIG_STORAGE_KEY = 'pulsehabit_supabase_config_v1';
+      let supabaseClient = null;
+      let supabaseUser = null;
+      let syncDebounceTimer = null;
+
+      function loadSupabaseConfig() {
+        try {
+          const raw = localStorage.getItem(SUPABASE_CONFIG_STORAGE_KEY);
+          if (raw) return JSON.parse(raw);
+        } catch (e) {}
+        return {
+          url: '',
+          anonKey: ''
+        };
+      }
+
+      function saveSupabaseConfig(cfg) {
+        try {
+          localStorage.setItem(SUPABASE_CONFIG_STORAGE_KEY, JSON.stringify(cfg));
+        } catch (e) {}
+      }
+
+      function initSupabase() {
+        const cfg = loadSupabaseConfig();
+        const urlInput = document.getElementById('sbProjectUrlInput');
+        const keyInput = document.getElementById('sbAnonKeyInput');
+        if (urlInput) urlInput.value = cfg.url || '';
+        if (keyInput) keyInput.value = cfg.anonKey || '';
+
+        if (!cfg.url || !cfg.anonKey || !window.supabase) {
+          updateCloudSyncBadge(false, null);
+          return;
+        }
+
+        try {
+          supabaseClient = window.supabase.createClient(cfg.url, cfg.anonKey);
+          // Check current active session
+          supabaseClient.auth.getSession().then(({ data, error }) => {
+            if (data && data.session && data.session.user) {
+              supabaseUser = data.session.user;
+              updateCloudSyncBadge(true, supabaseUser.email);
+              updateSupabaseModalUI();
+              // Auto-pull fresh cloud state on startup
+              pullFromSupabase(true);
+            } else {
+              supabaseUser = null;
+              updateCloudSyncBadge(false, null);
+              updateSupabaseModalUI();
+            }
+          });
+
+          // Listen for auth state changes
+          supabaseClient.auth.onAuthStateChange((event, session) => {
+            if (session && session.user) {
+              supabaseUser = session.user;
+              updateCloudSyncBadge(true, supabaseUser.email);
+              updateSupabaseModalUI();
+              if (event === 'SIGNED_IN') {
+                pullFromSupabase(false);
+              }
+            } else {
+              supabaseUser = null;
+              updateCloudSyncBadge(false, null);
+              updateSupabaseModalUI();
+            }
+          });
+        } catch (err) {
+          console.warn('Supabase initialization error:', err);
+          updateCloudSyncBadge(false, null);
+        }
+      }
+
+      function updateCloudSyncBadge(isLoggedIn, email) {
+        const icon = document.getElementById('cloudSyncStatusIcon');
+        const text = document.getElementById('cloudSyncStatusText');
+        const btn = document.getElementById('openCloudSyncBtn');
+        if (!icon || !text || !btn) return;
+
+        if (isLoggedIn) {
+          icon.textContent = '🟢';
+          text.textContent = 'Synced';
+          btn.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+          btn.classList.remove('bg-slate-100', 'text-slate-700');
+          btn.title = `Supabase Cloud Sync faol: ${email}`;
+        } else {
+          icon.textContent = '☁️';
+          text.textContent = 'Sync';
+          btn.classList.remove('bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+          btn.classList.add('bg-slate-100', 'text-slate-700');
+          btn.title = 'Supabase Cloud Sync: Ulanmagan';
+        }
+      }
+
+      function updateSupabaseModalUI() {
+        const sessionSec = document.getElementById('sbSessionSection');
+        const authSec = document.getElementById('sbAuthSection');
+        const emailText = document.getElementById('sbUserEmailText');
+        if (!sessionSec || !authSec) return;
+
+        if (supabaseUser) {
+          sessionSec.classList.remove('hidden');
+          authSec.classList.add('hidden');
+          if (emailText) emailText.textContent = supabaseUser.email;
+        } else {
+          sessionSec.classList.add('hidden');
+          authSec.classList.remove('hidden');
+        }
+      }
+
+      async function pullFromSupabase(isSilent = false) {
+        if (!supabaseClient || !supabaseUser) return;
+        try {
+          const { data, error } = await supabaseClient
+            .from('pulsehabit_data')
+            .select('state, updated_at')
+            .eq('user_id', supabaseUser.id)
+            .maybeSingle();
+
+          if (error) {
+            console.warn('Supabase pull error:', error);
+            if (!isSilent) showToast('Bulutdan yuklashda xatolik yuz berdi', 'error');
+            return;
+          }
+
+          if (data && data.state && Array.isArray(data.state.habits)) {
+            // Apply loaded cloud state
+            appState = data.state;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+            renderAll();
+            if (!isSilent) showToast('☁️ Bulutdagi so\'nggi ma\'lumotlar yuklandi!', 'success');
+          } else {
+            // No record exists in cloud yet -> push local data to create it
+            await pushToSupabase(true);
+            if (!isSilent) showToast('☁️ Dastlabki ma\'lumotlar bulutga saqlandi!', 'success');
+          }
+        } catch (err) {
+          console.error('Supabase pull failed:', err);
+        }
+      }
+
+      async function pushToSupabase(force = false) {
+        if (!supabaseClient || !supabaseUser) return;
+        if (!force) {
+          clearTimeout(syncDebounceTimer);
+          syncDebounceTimer = setTimeout(() => executePushToSupabase(), 1200);
+        } else {
+          await executePushToSupabase();
+        }
+      }
+
+      async function executePushToSupabase() {
+        if (!supabaseClient || !supabaseUser) return;
+        try {
+          const icon = document.getElementById('cloudSyncStatusIcon');
+          if (icon) icon.textContent = '🔄';
+
+          const { error } = await supabaseClient
+            .from('pulsehabit_data')
+            .upsert({
+              user_id: supabaseUser.id,
+              state: appState,
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id' });
+
+          if (error) {
+            console.warn('Supabase push error:', error);
+          } else {
+            updateCloudSyncBadge(true, supabaseUser.email);
+          }
+        } catch (err) {
+          console.error('Supabase push failed:', err);
+        }
+      }
+
+      function openSupabaseModal() {
+        const overlay = document.getElementById('supabaseModalOverlay');
+        if (!overlay) return;
+        overlay.classList.remove('hidden');
+        overlay.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+        updateSupabaseModalUI();
+      }
+
+      function closeSupabaseModal() {
+        const overlay = document.getElementById('supabaseModalOverlay');
+        if (!overlay) return;
+        overlay.classList.add('hidden');
+        overlay.classList.remove('flex');
+        document.body.style.overflow = '';
+      }
+
       function saveState() {
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+          // Auto push to Supabase Cloud if connected
+          pushToSupabase(false);
         } catch (err) {}
       }
 
@@ -3708,7 +3996,7 @@
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `nurhabit_backup_${selectedDate}.json`;
+        link.download = `pulsehabit_backup_${selectedDate}.json`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -3822,7 +4110,7 @@
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `nurhabit_export_${selectedDate}.csv`;
+        link.download = `pulsehabit_export_${selectedDate}.csv`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -3988,14 +4276,14 @@
           const pill = document.createElement('button');
           pill.type = 'button';
           pill.className = `px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
-  isActive
-    ? 'bg-emerald-600 text-white shadow-xs'
-    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
-}`;
+            isActive
+              ? 'bg-emerald-600 text-white shadow-xs'
+              : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
+          }`;
           pill.innerHTML = `
             <span>${escapeHtml(z.name)}</span>
-            <span class="text-[10px] font-mono ${isActive ? 'text-emerald-100' : 'text-slate-400'}">${count}/${z.target}</span>
-            ${isDone ? '<span class="text-emerald-300 text-[11px]">✓</span>' : ''}
+            <span class="text-[10px] font-mono ${isActive ? 'text-emerald-100' : 'text-slate-500'}">${count}/${z.target}</span>
+            ${isDone ? '<span class="text-emerald-600 text-[11px] font-bold">✓</span>' : ''}
           `;
           pill.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -4125,6 +4413,135 @@
 
       // ==================== EVENT LISTENERS ====================
       function initEventListeners() {
+        // Supabase Cloud Sync Event Listeners
+        const openCloudBtn = document.getElementById('openCloudSyncBtn');
+        if (openCloudBtn) openCloudBtn.addEventListener('click', openSupabaseModal);
+
+        const drawerCloudBtn = document.getElementById('drawerCloudSyncBtn');
+        if (drawerCloudBtn) drawerCloudBtn.addEventListener('click', openSupabaseModal);
+
+        const closeSbBtn = document.getElementById('closeSupabaseModalBtn');
+        if (closeSbBtn) closeSbBtn.addEventListener('click', closeSupabaseModal);
+
+        const sbSaveConfigBtn = document.getElementById('sbSaveConfigBtn');
+        if (sbSaveConfigBtn) {
+          sbSaveConfigBtn.addEventListener('click', () => {
+            const url = document.getElementById('sbProjectUrlInput').value.trim();
+            const anonKey = document.getElementById('sbAnonKeyInput').value.trim();
+            if (!url || !anonKey) {
+              showToast('Iltimos, Project URL va Anon Key ni kiriting', 'error');
+              return;
+            }
+            saveSupabaseConfig({ url, anonKey });
+            initSupabase();
+            showToast('Supabase kalitlari saqlandi!', 'success');
+          });
+        }
+
+        const sbSignInBtn = document.getElementById('sbSignInBtn');
+        if (sbSignInBtn) {
+          sbSignInBtn.addEventListener('click', async () => {
+            if (!supabaseClient) {
+              showToast('Avval Supabase kalitlarini kiriting', 'error');
+              document.getElementById('sbConfigDetails').open = true;
+              return;
+            }
+            const email = document.getElementById('sbEmailInput').value.trim();
+            const password = document.getElementById('sbPasswordInput').value;
+            const msgEl = document.getElementById('sbAuthMessage');
+            if (!email || !password) {
+              showToast('Email va parolni kiriting', 'error');
+              return;
+            }
+            sbSignInBtn.disabled = true;
+            sbSignInBtn.textContent = 'Kirilmoqda...';
+            try {
+              const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+              if (error) {
+                msgEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-700');
+                msgEl.classList.add('bg-rose-50', 'text-rose-700');
+                msgEl.textContent = 'Xatolik: ' + error.message;
+              } else {
+                msgEl.classList.remove('hidden', 'bg-rose-50', 'text-rose-700');
+                msgEl.classList.add('bg-emerald-50', 'text-emerald-700');
+                msgEl.textContent = 'Muvaffaqiyatli kirildi!';
+                showToast('Tizimga kirildi!', 'success');
+                setTimeout(() => closeSupabaseModal(), 800);
+              }
+            } catch (err) {
+              msgEl.classList.remove('hidden');
+              msgEl.textContent = 'Xatolik: ' + err.message;
+            } finally {
+              sbSignInBtn.disabled = false;
+              sbSignInBtn.textContent = 'Kirish (Sign In)';
+            }
+          });
+        }
+
+        const sbSignUpBtn = document.getElementById('sbSignUpBtn');
+        if (sbSignUpBtn) {
+          sbSignUpBtn.addEventListener('click', async () => {
+            if (!supabaseClient) {
+              showToast('Avval Supabase kalitlarini kiriting', 'error');
+              document.getElementById('sbConfigDetails').open = true;
+              return;
+            }
+            const email = document.getElementById('sbEmailInput').value.trim();
+            const password = document.getElementById('sbPasswordInput').value;
+            const msgEl = document.getElementById('sbAuthMessage');
+            if (!email || !password) {
+              showToast('Email va parolni kiriting', 'error');
+              return;
+            }
+            sbSignUpBtn.disabled = true;
+            sbSignUpBtn.textContent = 'Yaratilmoqda...';
+            try {
+              const { data, error } = await supabaseClient.auth.signUp({ email, password });
+              if (error) {
+                msgEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-700');
+                msgEl.classList.add('bg-rose-50', 'text-rose-700');
+                msgEl.textContent = 'Xatolik: ' + error.message;
+              } else {
+                msgEl.classList.remove('hidden', 'bg-rose-50', 'text-rose-700');
+                msgEl.classList.add('bg-emerald-50', 'text-emerald-700');
+                msgEl.textContent = 'Ro\'yxatdan o\'tildi! Emaildagi tasdiqlash xatini tekshiring yoki to\'g\'ridan-to\'g\'ri kiring.';
+                showToast('Ro\'yxatdan o\'tildi!', 'success');
+              }
+            } catch (err) {
+              msgEl.classList.remove('hidden');
+              msgEl.textContent = 'Xatolik: ' + err.message;
+            } finally {
+              sbSignUpBtn.disabled = false;
+              sbSignUpBtn.textContent = 'Ro\'yxatdan o\'tish (Sign Up)';
+            }
+          });
+        }
+
+        const sbLogoutBtn = document.getElementById('sbLogoutBtn');
+        if (sbLogoutBtn) {
+          sbLogoutBtn.addEventListener('click', async () => {
+            if (supabaseClient) {
+              await supabaseClient.auth.signOut();
+              supabaseUser = null;
+              updateCloudSyncBadge(false, null);
+              updateSupabaseModalUI();
+              showToast('Hisobdan chiqildi', 'info');
+            }
+          });
+        }
+
+        const sbManualSyncBtn = document.getElementById('sbManualSyncBtn');
+        if (sbManualSyncBtn) {
+          sbManualSyncBtn.addEventListener('click', async () => {
+            sbManualSyncBtn.disabled = true;
+            sbManualSyncBtn.textContent = 'Sinxronlanmoqda...';
+            await pullFromSupabase(false);
+            await pushToSupabase(true);
+            sbManualSyncBtn.disabled = false;
+            sbManualSyncBtn.textContent = '🔄 Hozir sinxronlash (Pull & Push)';
+          });
+        }
+
         // Mobile Header Drawer Toggle
         const mobileMenuBtn = document.getElementById('toggleMobileToolbarBtn');
         const toolsDrawer = document.getElementById('headerToolsDrawer');
@@ -4933,6 +5350,7 @@
 
       // Initialize App
       initEventListeners();
+      initSupabase();
       switchView('daily');
       renderAll();
     })();
