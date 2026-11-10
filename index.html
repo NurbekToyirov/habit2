@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-  <title>PulseHabit — Habit, Namoz, Mind Detox &amp; Diary Tracker</title>
+  <title>NurHabit — Habit, Namoz, Mind Detox &amp; Diary Tracker</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -184,7 +184,7 @@
         </div>
         <div class="min-w-0">
           <div class="flex items-center gap-1.5">
-            <h1 class="text-sm sm:text-lg font-bold tracking-tight text-slate-900 truncate">PulseHabit</h1>
+            <h1 class="text-sm sm:text-lg font-bold tracking-tight text-slate-900 truncate">NurHabit</h1>
             <span id="headerTodayRankBadge" class="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full accent-badge border shrink-0">Rank S</span>
           </div>
           <p class="text-[10px] sm:text-[11px] text-slate-500 truncate" id="headerActiveDateSubtitle">Loading date...</p>
@@ -1550,13 +1550,13 @@
           <!-- SQL Helper snippet -->
           <div class="pt-2 border-t border-slate-200/80">
             <span class="block text-[10px] font-bold text-slate-600 mb-1">Supabase SQL Editor'da 1 marta yurgiziladigan jadval kodi:</span>
-            <pre class="bg-slate-900 text-slate-200 p-2.5 rounded-lg text-[10px] font-mono overflow-x-auto select-all">CREATE TABLE IF NOT EXISTS pulsehabit_data (
+            <pre class="bg-slate-900 text-slate-200 p-2.5 rounded-lg text-[10px] font-mono overflow-x-auto select-all">CREATE TABLE IF NOT EXISTS nurhabit_data (
   user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   state jsonb NOT NULL,
   updated_at timestamptz DEFAULT now()
 );
-ALTER TABLE pulsehabit_data ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can manage own data" ON pulsehabit_data
+ALTER TABLE nurhabit_data ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can manage own data" ON nurhabit_data
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);</pre>
           </div>
         </div>
@@ -1569,7 +1569,7 @@ CREATE POLICY "Users can manage own data" ON pulsehabit_data
 
   <script>
     (function () {
-      const STORAGE_KEY = 'pulsehabit_tracker_state_v6';
+      const STORAGE_KEY = 'nurhabit_tracker_state_v1';
       const THEME_STORAGE_KEY = 'pulsehabit_theme_prefs_v1';
 
       const PALETTES = {
@@ -1943,7 +1943,7 @@ CREATE POLICY "Users can manage own data" ON pulsehabit_data
 
       function loadState() {
         try {
-          const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('pulsehabit_tracker_state_v5') || localStorage.getItem('pulsehabit_tracker_state_v4');
+          const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('pulsehabit_tracker_state_v6') || localStorage.getItem('pulsehabit_tracker_state_v5') || localStorage.getItem('pulsehabit_tracker_state_v4');
           if (raw) {
             const parsed = JSON.parse(raw);
             if (parsed && Array.isArray(parsed.habits)) {
@@ -1968,7 +1968,9 @@ CREATE POLICY "Users can manage own data" ON pulsehabit_data
 
       
       // ==================== SUPABASE CLOUD SYNC ENGINE ====================
-      const SUPABASE_CONFIG_STORAGE_KEY = 'pulsehabit_supabase_config_v1';
+      const SUPABASE_CONFIG_STORAGE_KEY = 'nurhabit_supabase_config_v1';
+      const SB_TABLE = 'nurhabit_data';
+      const SB_FALLBACK_TABLE = 'pulsehabit_data';
       let supabaseClient = null;
       let supabaseUser = null;
       let syncDebounceTimer = null;
@@ -2080,11 +2082,20 @@ CREATE POLICY "Users can manage own data" ON pulsehabit_data
       async function pullFromSupabase(isSilent = false) {
         if (!supabaseClient || !supabaseUser) return;
         try {
-          const { data, error } = await supabaseClient
-            .from('pulsehabit_data')
+          let res = await supabaseClient
+            .from(SB_TABLE)
             .select('state, updated_at')
             .eq('user_id', supabaseUser.id)
             .maybeSingle();
+          if (res.error && res.error.code === '42P01') {
+            // Table nurhabit_data does not exist, try legacy pulsehabit_data
+            res = await supabaseClient
+              .from(SB_FALLBACK_TABLE)
+              .select('state, updated_at')
+              .eq('user_id', supabaseUser.id)
+              .maybeSingle();
+          }
+          const { data, error } = res;
 
           if (error) {
             console.warn('Supabase pull error:', error);
@@ -2124,8 +2135,8 @@ CREATE POLICY "Users can manage own data" ON pulsehabit_data
           const icon = document.getElementById('cloudSyncStatusIcon');
           if (icon) icon.textContent = '🔄';
 
-          const { error } = await supabaseClient
-            .from('pulsehabit_data')
+          let { error } = await supabaseClient
+            .from(SB_TABLE)
             .upsert({
               user_id: supabaseUser.id,
               state: appState,
@@ -3996,7 +4007,7 @@ CREATE POLICY "Users can manage own data" ON pulsehabit_data
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `pulsehabit_backup_${selectedDate}.json`;
+        link.download = `nurhabit_backup_${selectedDate}.json`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -4110,7 +4121,7 @@ CREATE POLICY "Users can manage own data" ON pulsehabit_data
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `pulsehabit_export_${selectedDate}.csv`;
+        link.download = `nurhabit_export_${selectedDate}.csv`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
