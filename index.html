@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-  <title>PulseHabit — Habit, Namoz, Mind Detox &amp; Diary Tracker</title>
+  <title>NURHabit — Habit, Namoz, Mind Detox &amp; Diary Tracker</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -183,7 +183,7 @@
         </div>
         <div class="min-w-0">
           <div class="flex items-center gap-1.5">
-            <h1 class="text-sm sm:text-lg font-bold tracking-tight text-slate-900 truncate">PulseHabit</h1>
+            <h1 class="text-sm sm:text-lg font-bold tracking-tight text-slate-900 truncate">NURHabit</h1>
             <span id="headerTodayRankBadge" class="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full accent-badge border shrink-0">Rank S</span>
           </div>
           <p class="text-[10px] sm:text-[11px] text-slate-500 truncate" id="headerActiveDateSubtitle">Loading date...</p>
@@ -1476,8 +1476,8 @@
 
   <script>
     (function () {
-      const STORAGE_KEY = 'pulsehabit_tracker_state_v6';
-      const THEME_STORAGE_KEY = 'pulsehabit_theme_prefs_v1';
+      const STORAGE_KEY = 'nurhabit_tracker_state_v6';
+      const THEME_STORAGE_KEY = 'nurhabit_theme_prefs_v1';
 
       const PALETTES = {
         indigo: { hex600: '#4f46e5', hex700: '#4338ca', hex50: '#eef2ff', hex100: '#e0e7ff', text: '#4338ca', rgb: '79, 70, 229' },
@@ -1850,7 +1850,7 @@
 
       function loadState() {
         try {
-          const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('pulsehabit_tracker_state_v5') || localStorage.getItem('pulsehabit_tracker_state_v4');
+          const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('nurhabit_tracker_state_v5') || localStorage.getItem('nurhabit_tracker_state_v4');
           if (raw) {
             const parsed = JSON.parse(raw);
             if (parsed && Array.isArray(parsed.habits)) {
@@ -3708,7 +3708,7 @@
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `pulsehabit_backup_${selectedDate}.json`;
+        link.download = `nurhabit_backup_${selectedDate}.json`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -3822,7 +3822,7 @@
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `pulsehabit_export_${selectedDate}.csv`;
+        link.download = `nurhabit_export_${selectedDate}.csv`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
